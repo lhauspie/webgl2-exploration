@@ -5,3 +5,5 @@
 - Step 3 : Add some color to the square and triangle
 - Step 4 : Make the square rotate
 - Step 5 : Let's 3Dify the square to cube
+- Step 5.1 : Let's play with color indices
+
