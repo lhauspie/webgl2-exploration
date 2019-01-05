@@ -4,3 +4,4 @@
 - Step 2 : Display a 2D Square and a 2D Triangle on the canvas
 - Step 3 : Add some color to the square and triangle
 - Step 4 : Make the square rotate
+- Step 5 : Let's 3Dify the square to cube
