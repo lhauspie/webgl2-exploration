@@ -10,3 +10,4 @@
 - Step 6 : Refactor to move shaders to `index.html`
 - Step 7 : Refactor to have a clearer and more maintainable code + Lighting
 - Step 8 : Upgrade the GLSL version to 3.00 ES + Phong Shading
+- Step 9 : Adding Toon Shading to Phong Shading

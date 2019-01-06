@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="../gl-matrix.js"></script>
+
+    <script id="vertex-shader" type="x-shader/x-vertex"># version 300 es
+      in vec3 aVertexPosition;
+      in vec3 aVertexNormal;
+      in vec4 aVertexColor;
+      
+      uniform mat4 uNormalMatrix, uModelViewMatrix, uProjectionMatrix;
+      
+      out vec3 vPosition;
+      out vec3 vNormal;
+      out lowp vec4 vColor;
+      
+      void main(void) {
+        vec4 vertPos4 = uModelViewMatrix * vec4(aVertexPosition, 1.0);
+        vPosition = vec3(vertPos4) / vertPos4.w;
+        vNormal = vec3(uNormalMatrix * vec4(aVertexNormal, 0.0));
+        vColor = aVertexColor;
+        gl_Position = uProjectionMatrix * vertPos4;
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment"># version 300 es
+      precision mediump float;
+      
+      const vec3 cLightPos = vec3(1.0, 2.5, 6.0);
+      const float cKa = 1.0;
+      const float cKd = 1.0;
+      const float cKs = 1.0;
+      const float cShininess = 300.0;
+      const vec4 cAmbientColor = vec4(0.1, 0.1, 0.1, 1.0);
+      const vec4 cDiffuseColor = vec4(0.267, 0.329, 0.415, 1.0);
+      const vec4 cSpecularColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+      in vec3 vPosition;
+      in vec3 vNormal;
+      in lowp vec4 vColor;
+
+      out vec4 fragColor;
+
+      void main(void) { // http://evasion.imag.fr/Enseignement/cours/2012/SIA/Shaders/tp1.html
+        vec3 N = normalize(vNormal);
+        vec3 L = normalize(cLightPos - vPosition);
+
+        // Lambert's cosine law
+        float lambertian = max(dot(N, L), 0.0);
+
+        // THE PHONG PART ( Specular)
+        float specular = 0.0;
+        if (lambertian > 0.0) {
+            vec3 R = reflect(-L, N);      // Reflected light vector
+            vec3 V = normalize(-vPosition); // Vector to viewer
+            // Compute the specular term
+            float specAngle = max(dot(R, V), 0.0);
+            specular = pow(specAngle, cShininess);
+        }
+
+        // THE TOON PART (Adding some shades of grey)
+        vec4 greyDegree;
+        if (lambertian > 0.9) {
+          greyDegree = vec4(vec3(1.0), 1.0);
+        } else if (lambertian > 0.7) {
+          greyDegree = vec4(vec3(0.8), 1.0);
+        } else if (lambertian > 0.5) {
+          greyDegree = vec4(vec3(0.6), 1.0);
+        } else if (lambertian > 0.3) {
+          greyDegree = vec4(vec3(0.4), 1.0);
+        } else if (lambertian > 0.1) {
+          greyDegree = vec4(vec3(0.2), 1.0);
+        } else {
+          greyDegree = vec4(vec3(0.0), 1.0);
+        }
+
+        // Ambient color only
+        //   fragColor = vec4(cKa * cAmbientColor * vColor);
+        // Diffuse color only
+        //   fragColor = greyDegree * vec4(cKd * lambertian * vColor);
+        // Specular color only
+        //   fragColor = vec4(cKs * specular * cSpecularColor);
+
+        // all colors
+        fragColor = greyDegree * vec4(cKa * cAmbientColor +
+                        cKd * lambertian * vColor +
+                        cKs * specular * cSpecularColor);
+      }
+    </script>
+
+    <script src="main.js"></script>
+  </head>
+  <body onload="init()" class="bg">
+    <canvas id="canvas" height="900px" style="background-color: transparent"></canvas>
+  </body>
+</html>
