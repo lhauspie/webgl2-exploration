@@ -8,3 +8,4 @@
 - Step 5.1 : Let's play with color indices
 - Step 5.2 : Make the color moving with rotation
 - Step 6 : Refactor to move shaders to `index.html`
+- Step 7 : Refactor to have a clearer and more maintainable code + Lighting
